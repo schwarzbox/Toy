@@ -14,7 +14,7 @@ Asteroids
 
 Breakout
 
-![Screenshot](screenshot/screenshot1.png)
+![Screenshot](screenshot/screenshot2.png)
 
 Notes:
 
