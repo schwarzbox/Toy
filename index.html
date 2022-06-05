@@ -1,0 +1,201 @@
+<!-- index.html -->
+
+<!-- Build on top of pixi.js and pixi-sound.js -->
+<!-- Develop -> Disable Cross-Origin Restrictions -->
+
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>PIXI</title>
+    <!-- * all the tags in HTML document -->
+    <style> * {padding: 0; margin: 0}</style>
+    <script src="lib/pixi.min.js"></script>
+    <script src="lib/pixi-sound.js"></script>
+
+</head>
+
+<body style="background-color:dimgray;">
+    <div align="center">
+        <p id='maxFPS'></p>
+        <p id='curFPS'></p>
+        <p id='averFPS'></p>
+        <p id='drawCalls'></p>
+        <p id='objects'></p>
+        <p id='ui'></p>
+        <p id='psystems'></p>
+        <p id='debugPrint'></p>
+    </div>
+    <!-- settings -->
+    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="src/debug.js"></script>
+    <script type="text/javascript">
+        'use strict'
+
+        // remove lines beetween tiles
+        PIXI.settings.ROUND_PIXELS = true;
+        const GG = {
+            Application : PIXI.Application,
+            Loader : PIXI.Loader.shared,
+            Sound: PIXI.sound,
+            Resources : PIXI.Loader.shared.resources,
+            Filters : PIXI.filters,
+            Utils : PIXI.utils,
+            TextureCache : PIXI.utils.TextureCache,
+            Graphics : PIXI.Graphics,
+            Container: PIXI.Container,
+            ParticleContainer: PIXI.ParticleContainer,
+            Polygon : PIXI.Polygon,
+            Rectangle: PIXI.Rectangle,
+            Texture : PIXI.Texture,
+            RenderTexture : PIXI.RenderTexture,
+            Sprite : PIXI.Sprite,
+            AnimatedSprite : PIXI.AnimatedSprite,
+            Text : PIXI.Text,
+            TextStyle : PIXI.TextStyle,
+            Point : PIXI.Point,
+            Ticker : PIXI.Ticker,
+            Runner : PIXI.Runner,
+            app: null,
+            ui: null,
+            scene: null,
+            uis: {},
+            scenes: {},
+            objects: {},
+            init: function() {},
+            loop: function() {},
+            end: function() {},
+        };
+
+        GG.Utils.sayHello(
+            GG.Utils.isWebGLSupported() ? "WebGL" : "canvas"
+        );
+
+        // Create a Pixi Application
+        GG.app = new GG.Application(
+            {
+                width: Settings.game.canvasWidth,
+                height: Settings.game.canvasHeight,
+                antialias: false,
+                transparent: false,
+                resolution: 1,
+                forceCanvas: false,
+            }
+        );
+
+        // set global cursors styles
+        // gui reserved for ui cursor
+        let interaction = GG.app.renderer.plugins.interaction
+        for (let icon in Settings.cursors) {
+            interaction.cursorStyles[icon] = Settings.cursors[icon];
+        }
+
+        GG.app.renderer.backgroundColor = Settings.game.bgColor;
+        GG.app.renderer.autoDensity = true;
+
+        // CSS style
+        GG.app.renderer.view.style.display = "block";
+        if (Settings.game.fullScreen) {
+            GG.app.renderer.view.style.position = "absolute";
+            GG.app.renderer.resize(
+                window.innerWidth, window.innerHeight
+            )
+        } else {
+            GG.app.renderer.view.style.margin = "0 auto"
+        }
+
+        //Add the canvas that PIXI created to the HTML document
+        document.body.appendChild(GG.app.view)
+
+        // FPS
+        let maximumFPS = 0;
+        let loopCounter = 0;
+        let averageSum = 0;
+        let averageFPS = 0
+        // Draw calls
+        let drawCount = 0;
+        if (Settings.game.info) {
+            const renderer = GG.app.renderer;
+            const drawElements = renderer.gl.drawElements;
+            renderer.gl.drawElements = (...args) => {
+                drawElements.call(renderer.gl, ...args);
+                drawCount++;
+            };
+        }
+
+        // Loop
+        GG.init = function() {
+            setTimeout(
+                () => {
+                    console.log("[All files loaded]");
+                    console.log("[Init...]");
+
+                    initLoop();
+
+                    GG.app.ticker.add(
+                        (delta) => GG.loop(
+                            Settings.game.fps || delta/60
+                        )
+                    );
+                },
+                Settings.game.loadTimeout
+            );
+
+        }
+
+        GG.loop = function(delta) {
+            updateLoop(delta);
+
+            // Debug info
+            if (Settings.game.info) {
+                let FPS = GG.app.ticker.FPS;
+                maximumFPS = FPS > maximumFPS ? FPS : maximumFPS;
+                loopCounter++;
+                averageSum += FPS;
+                if (loopCounter > 60) {
+                    averageFPS = averageSum/60;
+                    loopCounter = 0;
+                    averageSum = 0;
+                }
+
+                maxFPS.innerHTML = `Max FPS: ${maximumFPS}`;
+                curFPS.innerHTML = `FPS: ${FPS}`;
+                averFPS.innerHTML = `Average FPS: ${averageFPS}`;
+                drawCalls.innerHTML = `DrawCalls: ${drawCount}`;
+                drawCount = 0;
+                if (GG.scene) {
+                    objects.innerHTML=`Objects ${GG.scene.objects.length}`;
+                    psystems.innerHTML=`Particle Systems ${GG.scene.particleSystems.length}`;
+                }
+                if (GG.ui) {
+                    ui.innerHTML=`UI ${GG.ui.objects.length}`;
+                }
+            }
+        }
+
+        GG.end = function () {
+            endLoop();
+            console.log("[Exit]");
+        }
+
+    </script>
+    <script type="text/javascript" src="src/vector.js"></script>
+    <script type="text/javascript" src="src/tools.js"></script>
+
+    <script type="text/javascript" src="src/load.js"></script>
+    <script type="text/javascript" src="src/events.js"></script>
+    <!-- objects -->
+    <script type="text/javascript" src="src/proto.js"></script>
+    <script type="text/javascript" src="src/shape.js"></script>
+    <script type="text/javascript" src="src/sprite.js"></script>
+    <script type="text/javascript" src="src/text.js"></script>
+    <script type="text/javascript" src="src/particle.js"></script>
+    <script type="text/javascript" src="src/timer.js"></script>
+    <script type="text/javascript" src="src/camera.js"></script>
+    <!-- gui -->
+    <script type="text/javascript" src="src/gui.js"></script>
+    <!-- scene -->
+    <script type="text/javascript" src="src/scene.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
