@@ -5,7 +5,7 @@ class Sprite extends Proto {
     constructor(tag, scene, x, y, type, anchor, angle, scale) {
         super(tag, x, y, anchor, angle, scale);
         this.scene = scene;
-        this.type={
+        this.type = {
             texture: type.texture,
             frame: type.frame,
             tiles: type.tiles || {x:1, y:1},
@@ -61,7 +61,7 @@ class AnimatedSprite extends Proto {
     constructor(tag, scene, x, y, type,anchor, angle, scale) {
         super(tag, x, y, anchor, angle, scale);
         this.scene = scene;
-        this.type={
+        this.type = {
             texture: type.texture,
             frame: type.frame,
             tiles: type.tiles || {x:1, y:1},

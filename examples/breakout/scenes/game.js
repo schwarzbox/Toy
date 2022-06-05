@@ -23,7 +23,6 @@ export class Game extends Scene {
                 texture: GG.Resources[
                     GG.objects.Platform.image
                 ].texture,
-                interactive: true,
                 collide: true,
                 toCollide: GG.objects.Platform.toCollide,
                 colliderOffset: GG.objects.Platform.colliderOffset,
@@ -88,7 +87,7 @@ export class Game extends Scene {
     }
 
     removeLifeLabel() {
-        this.lifes.remove(this.platform.life);
+        this.lifes.objects[this.platform.life].setDead(true);
     }
 
     addHud(wid, hei) {

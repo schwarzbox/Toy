@@ -5,7 +5,7 @@ class Shape extends Proto {
     constructor(tag, scene, x, y, type, anchor, angle, scale) {
         super(tag, x, y, anchor, angle, scale);
         this.scene = scene;
-        this.type={
+        this.type = {
             shape: type.shape,
             wid: type.wid || 0,
             hei: type.hei || 0,

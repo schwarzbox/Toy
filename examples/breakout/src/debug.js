@@ -121,3 +121,5 @@ class Debug {
         );
     }
 }
+
+console.log('[Import -> Debug]')

@@ -68,7 +68,7 @@ export class Brick extends Sprite {
         if (this.isConcrete && !other.isFire) {
             color = Settings.colors.white;
         } else {
-            if (Math.random() < 0.3) {
+            if (Math.random() < 0.2) {
                 const bonuses = [
                     GG.objects.Life,
                     GG.objects.Dead,

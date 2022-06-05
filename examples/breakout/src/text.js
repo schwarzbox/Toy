@@ -5,7 +5,7 @@ class Text extends Proto {
     constructor(tag, scene, x, y, type, anchor, angle, scale) {
         super(tag, x, y, anchor, angle, scale);
         this.scene = scene;
-        this.type={
+        this.type = {
             text: type.text.toString() || "",
             font: type.font || "Andale Mono",
             size: type.size || 16,

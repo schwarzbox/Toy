@@ -519,6 +519,7 @@ class Scene {
             }
         }
 
+
         for (let selfIndex in visible) {
             const self = visible[selfIndex];
 
@@ -526,17 +527,18 @@ class Scene {
 
             // important for optimization for totally static objects
             if (self.type.collide) {
-
                 for (const otherIndex in visible) {
                     const other = visible[otherIndex];
                     if (self !== other
                         && !other.isDead()
                         && self.type.toCollide.has(other.tag)
-                        && this.isCollide(self, other)) {
+                        && this.isCollide(self, other)
+                    ) {
                         self.onCollision(other);
-                        break;
                     }
                 }
+                // bounce once in one iteration
+                self._isBounce = false;
             }
         }
     }

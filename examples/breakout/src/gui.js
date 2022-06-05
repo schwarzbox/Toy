@@ -6,8 +6,7 @@ class GUI extends Shape {
         this.scene.addSprite(this, type.zindex);
         this.type.zindex = this.body.zIndex;
 
-
-        this.type.padding = type.padding;
+        this.type.padding = type.padding > 1 ? type.padding : 2;
         this.halfPad = this.type.padding / 2;
         this.halfBorder = this.type.border / 2;
 
@@ -167,6 +166,7 @@ class Button extends GUI {
         if (this.type.callback && isCallback) {
             this.type.callback();
         }
+        // reset after click
         this.sprite.setColor(0xFFFFFF);
     }
 }
@@ -176,7 +176,7 @@ class Bar extends GUI {
         this.scene.addSprite(this, type.zindex);
         this.type.zindex = this.body.zIndex;
 
-        this.type.padding = type.padding;
+        this.type.padding = type.padding > 1 ? type.padding : 2;
         this.halfPad = this.type.padding / 2;
         this.halfBorder = this.type.border / 2;
 
@@ -238,7 +238,7 @@ class Slider extends GUI {
         this.scene.addSprite(this, type.zindex);
         this.type.zindex = this.body.zIndex;
 
-        this.type.padding = type.padding;
+        this.type.padding = type.padding > 1 ? type.padding : 2;
         this.halfPad = this.type.padding / 2;
         this.halfBorder = this.type.border / 2;
 
@@ -251,12 +251,11 @@ class Slider extends GUI {
                                 wid: this.type.hei,
                                 hei: this.type.hei,
                                 fillColor: type.color,
-                                // lineColor: this.type.lineColor,
-                                // border: 0,
                                 interactive: true,
                              },
                              this.anchor, this.angle, this.scale);
 
+        this.type.color = type.color;
         this.sprite.max = type.max;
         this.sprite.min = type.min || 0;
         this.sprite.value = type.value || 0;
@@ -281,7 +280,7 @@ class Slider extends GUI {
 
     events() {
         Events.addObjectEvent(this.sprite, 'pointerdown', (x)=>{
-            this.sprite.setColor(this.type.color << 2);
+            this.sprite.setColor(0xFFFFFF);
             this.dx = x.data.global.x;
         });
         Events.addObjectEvent(this.sprite, 'pointermove', (x)=>{
@@ -297,11 +296,12 @@ class Slider extends GUI {
             }
         });
         Events.addObjectEvent(this.sprite, 'pointerup', (x)=>{
-            this.sprite.setColor(0xFFFFFF);
+            this.sprite.setColor(this.type.color);
+
             this.dx = null
         });
         Events.addObjectEvent(this.sprite, 'pointerupoutside', (x)=>{
-            this.sprite.setColor(0xFFFFFF);
+            this.sprite.setColor(this.type.color);
             this.dx = null
         });
     }
@@ -339,14 +339,20 @@ class Box extends GUI {
     init(type) {
         this.isBox = true;
         this.objects = [];
+        this.trash = new Set();
 
         this.scene.addSprite(this, type.zindex);
-        this.type.zindex = this.body.zIndex;
+        if (type.zindex) {
+            this.setZindex(type.zindex);
+        }
+
+
+        this.type.padding = type.padding > 1 ? type.padding : 2;
+        this.halfPad = this.type.padding / 2;
+        this.halfBorder = this.type.border / 2;
 
         this.type.sep = type.sep || 0;
         this.type.align = type.align || 'center';
-        this.type.padding = type.padding;
-        this.halfPad = this.type.padding/2;
 
         this.add();
 
@@ -365,12 +371,19 @@ class Box extends GUI {
         this.setBody(this.type);
     }
 
-    remove(index) {
-        const object = this.objects[index];
-        if (object) {
-            object.setDead(true);
+    update(dt) {
+        super.update(dt);
+        this.objects = [...this.objects].filter(
+            x => !this.trash.has(x)
+        );
+        this.trash.clear();
+
+        for (let index in this.objects) {
+            const object = this.objects[index];
+            if (object.isDead()) {
+                this.trash.add(object);
+            }
         }
-        this.objects.splice(index);
     }
 
     _removeAll() {
@@ -398,7 +411,8 @@ class HBox extends Box {
     }
 
     setSize() {
-        this.type.wid = 0;
+
+        this.type.wid = this.type.border;
         let maxhei = 0;
         for (let obj in this.objects) {
             if (this.objects[obj].type.hei > maxhei) {
@@ -407,11 +421,12 @@ class HBox extends Box {
             this.type.wid += this.objects[obj].type.wid + this.type.sep;
         }
         this.type.wid += this.type.padding - this.type.sep;
-        this.type.hei = maxhei + this.type.padding;
+        this.type.hei = maxhei + this.type.padding + this.type.border;
+
     }
 
     setXY() {
-        let posx = this.pos.x - this.type.wid * this.anchor.x + this.halfPad;
+        let posx = this.pos.x - this.type.wid * this.anchor.x + this.halfPad + this.halfBorder;
         let posy = 0;
 
         for (let obj in this.objects) {
@@ -447,7 +462,7 @@ class VBox extends Box {
 
     setSize() {
         let maxwid = 0;
-        this.type.hei = 0;
+        this.type.hei = this.type.border;
         for (let obj in this.objects) {
             if (this.objects[obj].type.wid > maxwid) {
                 maxwid = this.objects[obj].type.wid
@@ -455,13 +470,13 @@ class VBox extends Box {
             this.type.hei += this.objects[obj].type.hei + this.type.sep;
 
         }
-        this.type.wid = maxwid + this.type.padding;
+        this.type.wid = maxwid + this.type.padding + this.type.border;
         this.type.hei += this.type.padding - this.type.sep;
     }
 
     setXY() {
         let posx = 0
-        let posy = this.pos.y - this.type.hei * this.anchor.y + this.halfPad;
+        let posy = this.pos.y - this.type.hei * this.anchor.y + this.halfPad + this.halfBorder;
 
         for (let obj in this.objects) {
             posx = this.setAlign(this.objects[obj].type.wid);

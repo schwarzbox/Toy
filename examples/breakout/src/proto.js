@@ -47,6 +47,8 @@ class Proto {
         this.angAcc=0;
 
         this.uuid=Proto.uuid++;
+
+        this._isBounce=false;
     }
 
     setup(type) {
@@ -58,7 +60,9 @@ class Proto {
 
     init(type) {
         this.scene.addSprite(this, type.zindex);
-        this.type.zindex = this.body.zIndex;
+        if (type.zindex) {
+            this.setZindex(type.zindex);
+        }
 
         this.setBody(this.type);
 
@@ -224,7 +228,8 @@ class Proto {
     }
     setZindex(zindex) {
         this.type.zindex = zindex;
-        this.scene.container.setChildIndex(this.body, zindex);
+        this.body.zIndex = zindex;
+        this.scene.container.sortChildren();
     }
 
     setDead(bool) {
@@ -326,9 +331,14 @@ class Proto {
     }
 
     moveAndBounce(other, reduce=true) {
-         if (!this.type.dynamic) {
+        if (!this.type.dynamic) {
             return;
         }
+
+        if (this._isBounce) {
+            return;
+        }
+        this._isBounce = true;
 
         const oldvel = this.vel.clone();
         // use offset based on mag
@@ -337,11 +347,12 @@ class Proto {
             this.vel.mag() + other.vel.mag(),
             true
         );
+
         // lower speed when bounce with random delta
         if (this.vel.x == 0) {
             let reduce = 0
             if (reduce) {
-                const dx = Tools.randomRange(3, 8) - Math.random();
+                const dx = Tools.randomRange(2, 8) - Math.random();
                 reduce = oldvel.x / dx
             }
             this.vel.x = -(oldvel.x - reduce);
@@ -349,7 +360,7 @@ class Proto {
         if (this.vel.y == 0) {
             let reduce = 0
             if (reduce) {
-                const dy = Tools.randomRange(3, 8) - Math.random();
+                const dy = Tools.randomRange(2, 8) - Math.random();
                 reduce = oldvel.y / dy
             }
             this.vel.y = -(oldvel.y - reduce);
