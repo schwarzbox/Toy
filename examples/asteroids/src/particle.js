@@ -54,7 +54,7 @@ class Particle extends Sprite {
 
 class ParticleSystem  {
     constructor(
-        tag, object, offset=new Vector(), maxSize=1024,
+        tag, object, offset=new Vector(), zindex=null, maxSize=1024,
         // uvs used to change particle textures
         properties={
             vertices: false,
@@ -88,7 +88,7 @@ class ParticleSystem  {
         this.trash = new Set();
 
         this.scene = this.object.scene || this.object;
-        this.scene.addParticleSystem(this);
+        this.scene.addParticleSystem(this, zindex);
     }
     setObject(object) {
         this.object = object;

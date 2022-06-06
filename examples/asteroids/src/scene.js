@@ -74,33 +74,6 @@ class UI {
         this.container.interactive = true;
     }
 
-    addImage(
-        x, y,
-        image,
-        anchor=new Vector(0.5, 0.5),
-        zindex=null,
-        frame=null,
-        alpha=1
-    ) {
-        const texture = new GG.Texture(image);
-        if (frame) {
-            texture.frame = frame;
-        }
-        const sprite = new GG.Sprite();
-        sprite.texture = texture
-        sprite.position.set(x, y);
-        sprite.anchor.set(anchor.x, anchor.y)
-        sprite.zIndex = zindex;
-        sprite.alpha = alpha;
-        if (zindex!==null) {
-            this.container.addChildAt(sprite, zindex);
-        } else {
-            this.container.addChild(sprite);
-        }
-
-        return sprite;
-    }
-
     addSprite(object, zindex=null) {
         if (zindex!==null) {
             this.container.addChildAt(object.body, zindex);
@@ -134,7 +107,6 @@ class UI {
 
     _removeAll() {
         this.objects.forEach(obj => obj.setDead(true));
-        // this.container.children.forEach((obj) => {obj.destroy()});
     }
 
     end() {
@@ -297,6 +269,8 @@ class Scene {
         sprite.alpha = alpha;
         if (zindex!==null) {
             this.container.addChildAt(sprite, zindex);
+            sprite.zIndex = zindex;
+            this.container.sortChildren();
         } else {
             this.container.addChild(sprite);
         }
@@ -311,14 +285,22 @@ class Scene {
     addSprite(object, zindex=null) {
         if (zindex!==null) {
             this.container.addChildAt(object.body, zindex);
+            object.body.zIndex = zindex;
+            this.container.sortChildren();
         } else {
             this.container.addChild(object.body);
         }
         this.objects.push(object);
     }
 
-    addParticleSystem(ps) {
-        this.container.addChild(ps.container);
+    addParticleSystem(ps, zindex=null) {
+        if (zindex!==null) {
+            this.container.addChildAt(ps.container, zindex);
+            ps.container.zIndex = zindex;
+            this.container.sortChildren();
+        } else {
+            this.container.addChild(ps.container);
+        }
         this.particleSystems.push(ps);
     }
 
@@ -557,7 +539,23 @@ class Scene {
         this.particleSystems.forEach(ps => ps.setDead(true));
         this.objects.forEach(obj => obj.setDead(true));
 
-        // this.container.children.forEach(obj => obj.destroy());
+        const bodies = this.objects.map(x => x.body);
+        const systems = this.particleSystems.map(x => x.container);
+
+        const toDestroy = [];
+        this.container.children.forEach(
+            (child) => {
+                if (!(
+                      bodies.includes(child)
+                      || systems.includes(child)
+                    )
+                ) {
+                    toDestroy.push(child)
+                }
+            }
+        );
+
+        toDestroy.forEach(child => child.destroy());
 
         this.reactor.removeReactors();
         this.reactor.removeEmitters();

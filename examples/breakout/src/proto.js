@@ -60,9 +60,6 @@ class Proto {
 
     init(type) {
         this.scene.addSprite(this, type.zindex);
-        if (type.zindex) {
-            this.setZindex(type.zindex);
-        }
 
         this.setBody(this.type);
 
