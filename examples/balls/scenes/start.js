@@ -52,7 +52,8 @@ export class Start extends Scene {
                 padding: padding,
                 color: Settings.colors.gray,
                 callback: () => {
-                    title.setValue('JOY');
+                    title.setVisible(false);
+                    this.addBalls();
                 }
             },
             new Vector()
@@ -82,6 +83,28 @@ export class Start extends Scene {
 
     events() {
 
+    }
+
+    addBalls() {
+        for (let i=0; i<8; i++) {
+            const x = Tools.randomRange(
+                16, GG.app.renderer.view.width-16
+            );
+            const y = Tools.randomRange(
+                -128, 16
+            );
+
+            const ball = new GG.objects.Ball(
+                'ball', this, x, y,
+                {
+                    shape: 'circle',
+                    wid: 8,
+                    hei: 8,
+                    fillColor: Settings.colors.red,
+                    dynamic: true
+                }
+            );
+        }
     }
 
     update(dt) {

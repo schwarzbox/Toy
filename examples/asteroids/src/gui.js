@@ -85,6 +85,13 @@ class GUI extends Shape {
         }
     }
 
+    setVisible(bool){
+        super.setVisible(bool);
+        if (this.sprite) {
+            this.sprite.setVisible(bool);
+        }
+    }
+
     setup(type) {
 
     }

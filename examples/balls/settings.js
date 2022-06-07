@@ -4,7 +4,7 @@
 const Settings = {
     about: {
         version: 0.1,
-        title: 'Toy',
+        title: 'Balls',
         author: '',
         url: ''
     },
