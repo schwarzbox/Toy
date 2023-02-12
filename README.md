@@ -2,7 +2,7 @@
 
 v0.3
 
-Simple 2d Engine on top of pixi.js
+2d Engine on top of PixiJS
 
 # Hello World
 
@@ -14,9 +14,9 @@ Simple 2d Engine on top of pixi.js
 
 # Generate balls
 
-1. Create directory objects with the file ball.js
+1. Make dir objects/ with the file ball.js
 
-2. Add code in the ball.js
+2. Add code in the file ball.js
 
 ``` js
 // ball.js
@@ -34,8 +34,9 @@ export class Ball extends Shape {
 }
 ```
 Notes:
-- All classes are save in GG.objects avoid same name for classes
-- Default GUI classes were saved in GG.objects avoid same name for classes
+- Engine saves new user classes in GG.objects.
+- Engine saves default GUI classes in GG.objects.
+- Avoid same name for classes.
 
 3. Load class Ball to the Engine in the main.js
 
@@ -49,16 +50,16 @@ LoadSystem.objects(
 ```
 Notes:
 - Use main.js to load images, sounds, objects and scenes.
-- The initLoop function in main.js is an entry point for the app
+- The initLoop function in main.js is an entry point for the app.
 
 ``` js
 SceneSystem.init('Start', {}, true);
 
 ```
+- Start is a name of the scene which runs after the app started.
 
-- Start is a name of the scene which runs after the app started
 
-4. Create method addBalls for the class Start in the start.js
+4. Create method addBalls for the class Start in the file start.js
 
 ``` js
 addBalls() {
@@ -93,7 +94,7 @@ callback: () => {
 }
 ```
 
-6. Run index.html and try to generate balls on CLICK
+6. Run index.html and press CLICK button
 
 7. Set timer for the balls in the method setup in the class Ball
 
@@ -156,13 +157,13 @@ export class Ball extends Shape {
 }
 ````
 
-9. Run index.html and try to generate balls on CLICK
+9. Run index.html and press CLICK button
 
 ![Screenshot](screenshot/screenshot2.png)
 
 # Examples
 
-Check out more examples/
+Check out examples/
 
 ## Asteroids
 
